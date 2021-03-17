@@ -1,0 +1,49 @@
+{
+  "name": "instaclone",
+  "version": "1.0.0",
+  "description": "<a href=\"https://www.instaclone.net\"><img src=\"https://res.cloudinary.com/drwb19czo/image/upload/v1591476975/New_Project_1_yk24bj.png\" title=\"Instaclone\" alt=\"Instaclone banner\"></a>",
+  "main": "index.js",
+  "engines": {
+    "node": "12.14.1",
+    "npm": "6.14.4"
+  },
+  "scripts": {
+    "client": "cd client && npm run start",
+    "server": "nodemon index.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "node index.js",
+    "heroku-postbuild": "cd client && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.843.0",
+    "axios": "^0.19.2",
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "cloudinary": "^1.21.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.1.1",
+    "handlebars": "^4.7.6",
+    "helmet": "^3.21.2",
+    "jwt-simple": "^0.5.6",
+    "linkifyjs": "^2.1.9",
+    "mongoose": "^5.9.23",
+    "multer": "^1.4.2",
+    "multer-s3": "^2.9.0",
+    "node-pre-gyp": "^0.17.0",
+    "nodemailer": "^6.4.6",
+    "nodemon": "^2.0.4",
+    "shortid": "^2.2.16",
+    "socket.io": "^2.3.0",
+    "validator": "^12.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^5.1.0",
+    "dotenv": "^8.2.0",
+    "morgan": "^1.9.1"
+  }
+}
