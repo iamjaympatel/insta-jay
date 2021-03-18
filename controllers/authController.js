@@ -89,26 +89,23 @@ module.exports.loginAuthentication = async (req, res, next) => {
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     });
     if (!user || !user.password) {
-      console.log(user)
       return res.status(401).send({
         error: 'The credentials you provided are incorrect, please try again.',
       });
     }
 
-    if(user.password!==password){
-  res.status(401).json("passwor is not match")
-    };
-    // bcrypt.compare(password, user.password, (err, result) => {
-    //   if (err) {
-    //     return next(err);
-    //   }
-    //   if (!result) {
-    //     console.log(result)
-    //     return res.status(401).send({
-    //       error:
-    //         'The credentials you provided are incorrect, please try again.',
-    //     });
-    //   }
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) {
+        
+        return next(err);
+      }
+      if (!result) {
+        console.log(result)
+        return res.status(401).send({
+          error:
+            'The credentials you provided are incorrect, please try again.',
+        });
+      }
 
       res.send({
         user: {
@@ -116,16 +113,15 @@ module.exports.loginAuthentication = async (req, res, next) => {
           email: user.email,
           username: user.username,
           avatar: user.avatar,
-          following:user.following,
-          followers:user.followers
         },
         token: jwt.encode({ id: user._id }, process.env.JWT_SECRET),
       });
-    
+    });
   } catch (err) {
     next(err);
   }
 };
+
 
 module.exports.register = async (req, res, next) => {
   const { username, fullName, email, password } = req.body;
