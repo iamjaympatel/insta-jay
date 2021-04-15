@@ -20,10 +20,6 @@ const filters = require('../utils/filters');
 
 
 
-
-
-
-
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
   const { caption, filter: filterName } = req.body;
@@ -88,11 +84,7 @@ $push:{posts:post._id}
   }
 
   try {
-    // Updating followers feed with post
-
-    //const followersDocument = await Followers.find({ user: user._id });
-    //const Followers = followersDocument[0].followers;
-
+  
     const postObject = {
      // ...post.toObject(),
      post,
@@ -135,21 +127,16 @@ module.exports.deletePost = async (req, res, next) => {
     await User.findOneAndUpdate({_id:user._id},{
       $pull:{posts:post._id}
           })
-    //if (!postDelete.deletedCount) {
-   //   return res.status(500).send({ error: 'Could not delete the post.' });
- //   }
+   
     res.status(204).send();
   } catch (err) {
     next(err);
-   
-
   }
 
   try {
 
     const fuser=User.findById(user._id).populate('followers')
-    //const followersDocument = await Followers.find({ user: user._id });
-    //const followers = followersDocument[0].followers;
+
     socketHandler.deletePost(req, postId, user._id);
     fuser.followers.forEach((follower) =>
       socketHandler.deletePost(req, postId, follower.user)
@@ -166,18 +153,12 @@ module.exports.retrievePost = async (req, res, next) => {
     const post =await Post.findById(postId)
     .populate('author',' _id username fullName')
     .populate({path:'commentData.comments',populate:{path:'author',select:'_id username fullName'}})
-         
-    // Retrieve the post and the post's votes
-    
+
     if (post.length === 0) {
       return res
         .status(404)
         .send({ error: 'Could not find a post with that id.' });
     }
-    // Retrieve the comments associated with the post aswell as the comment's replies and votes
-    //const comments = await retrieveComments(postId, 0);
-
-    // const data=post
 
     return res.send(post);
   } catch (err) {
@@ -191,7 +172,7 @@ module.exports.votePost = async (req, res, next) => {
   const user = res.locals.user;
 
   try {
-    // Update the vote array if the user has not already liked the post
+
     const postLikeUpdate = await Post.updateOne({
        _id: postId,'postVotes.author':{ $ne:user._id}},
       {
@@ -202,8 +183,7 @@ module.exports.votePost = async (req, res, next) => {
       if (!postLikeUpdate.ok) {
         return res.status(500).send({ error: 'Could not like on the post.' });
       }
-      // Nothing was modified in the previous query meaning that the user has already liked the post
-      // Remove the user's like
+
       const postDislikeUpdate = await Post.updateOne(
         { _id: postId },
         { $pull: { postVotes: { author: user._id } } }
@@ -259,10 +239,9 @@ module.exports.retrievePostFeed = async (req, res, next) => {
 
   const user = res.locals.user;
   const { offset } = req.params;
-  
 
   try {
-   // const fuser = await User.find({_id:user._id });
+  
    const following=await User.findById(user._id).populate('following','_id')
     const followings=following.following
     const user_id=user._id
@@ -271,9 +250,8 @@ module.exports.retrievePostFeed = async (req, res, next) => {
    .populate('author','_id username fullName')
    .populate({path:'commentData.comments',select:'_id author commentVotes date message post',populate:{path:'author',select:'_id username fullName'}})
    .sort({date:-1})
-   //const posts=  await Post.find({author:user_id})
-
-    if (!user) {
+  
+   if (!user) {
       return res.status(404).send({ error: 'Could not find any posts.' });
     }
 
@@ -287,7 +265,6 @@ module.exports.retrievePostFeed = async (req, res, next) => {
 
 module.exports.retrieveSuggestedPosts = async (req, res, next) => {
   const { offset = 0 } = req.params;
-
   try {
     const posts =await Post.find({})
     .populate({path:'commentData.comments',populate:{path:'author',select:'_id username fullName'}})
@@ -304,12 +281,10 @@ module.exports.retrieveHashtagPosts = async (req, res, next) => {
   const { hashtag, offset } = req.params;
 
   try {
-
     const posts=await Post.find({hashtags:hashtag})
     .populate({path:'commentData.comments',populate:{path:'author',select:'_id username fullName'}})
     .sort({date:-1})
-   
-
+    
     return res.send({posts:posts});
   } catch (err) {
     next(err);
