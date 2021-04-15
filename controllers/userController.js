@@ -18,8 +18,6 @@ const {
 const { sendConfirmationEmail } = require('../utils/controllerUtils');
 const { post } = require('../routes');
 
-
-
 module.exports.retrieveUser = async (req, res, next) => {
   const { username } = req.params;
   const requestingUser = res.locals.user;
@@ -33,19 +31,7 @@ module.exports.retrieveUser = async (req, res, next) => {
         .status(404)
         .send({ error: 'Could not find a user with that username.' });
     }
-
-
     const posts =await Post.find({author:user._id}).populate('author',' _id username fullName').sort({date:-1})
-
-   
-
-    // const followersDocument = await Followers.findOne({
-    //   user: ObjectId(user._id),
-    // });
-
-    // const followingDocument = await Following.findOne({
-    //   user: ObjectId(user._id),
-    // });
 
     const isFollowing = await User.findOne({
       _id: requestingUser._id,
@@ -56,8 +42,7 @@ module.exports.retrieveUser = async (req, res, next) => {
       user,
       followers:user.followers.length,
       following:user.following.length,
-      // Check if the requesting user follows the retrieved user
-     
+    
        isFollowing: !!isFollowing,
     
       posts:{data: posts},
@@ -181,15 +166,6 @@ module.exports.followUser = async (req, res, next) => {
         .send({ error: 'Could not find a user with that id.' });
     }
 
-    // const followerUpdate = await Followers.updateOne(
-    //   { user: userId, 'followers.user': { $ne: user._id } },
-    //   { $push: { followers: { user: user._id } } }
-    // );
-
-    // const followingUpdate = await Following.updateOne(
-    //   { user: user._id, 'following.user': { $ne: userId } },
-    //   { $push: { following: { user: userId } } }
-    // );
 
     const followerUpdate=await User.updateOne({_id:userToFollow._id,followers: { $ne :user._id } },
                                                    {$push:{followers:user._id}})
@@ -204,8 +180,7 @@ const followingUpdate=await User.updateOne({_id:user._id,following: { $ne: userT
           .status(500)
           .send({ error: 'Could not follow user please try again later.' });
       }
-      // Nothing was modified in the above query meaning that the user is already following
-      // Unfollow instead
+
       const followerUnfollowUpdate =await User.updateOne({_id:userToFollow._id},
         {$pull:{followers:user._id}})
 
@@ -578,6 +553,4 @@ module.exports.retrieveSuggestedUsers = async (req, res, next) => {
     next(err);
   }
 };
-
-
 
