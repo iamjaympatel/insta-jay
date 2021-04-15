@@ -3,22 +3,16 @@ const linkify = require('linkifyjs');
 require('linkifyjs/plugins/hashtag')(linkify);
 const Post = require('../models/Post');
 const User=require('../models/User')
-
-
-//const Followers = require('../models/Followers');
 const Notification = require('../models/Notification');
 const socketHandler = require('../handlers/socketHandler');
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
-//const AWS=require('aws-sdk')
 const {
   retrieveComments,
   formatCloudinaryUrl,
   populatePostsPipeline,
 } = require('../utils/controllerUtils');
 const filters = require('../utils/filters');
-
-
 
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
@@ -92,12 +86,10 @@ $push:{posts:post._id}
       commentData: { commentCount: 0, comments: [] },
       postVotes: [],
     };
-
-    // socketHandler.sendPost(req, postObject, user._id);
+    
    user.followers.forEach((user) => {
       socketHandler.sendPost(
         req,
-        // Since the post is new there is no need to look up any fields
         postObject,
         user.followers
       );
@@ -132,9 +124,7 @@ module.exports.deletePost = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-
   try {
-
     const fuser=User.findById(user._id).populate('followers')
 
     socketHandler.deletePost(req, postId, user._id);
@@ -172,7 +162,6 @@ module.exports.votePost = async (req, res, next) => {
   const user = res.locals.user;
 
   try {
-
     const postLikeUpdate = await Post.updateOne({
        _id: postId,'postVotes.author':{ $ne:user._id}},
       {
@@ -261,8 +250,6 @@ module.exports.retrievePostFeed = async (req, res, next) => {
   }
 };
 
-
-
 module.exports.retrieveSuggestedPosts = async (req, res, next) => {
   const { offset = 0 } = req.params;
   try {
@@ -276,10 +263,8 @@ module.exports.retrieveSuggestedPosts = async (req, res, next) => {
   }
 };
 
-
 module.exports.retrieveHashtagPosts = async (req, res, next) => {
   const { hashtag, offset } = req.params;
-
   try {
     const posts=await Post.find({hashtags:hashtag})
     .populate({path:'commentData.comments',populate:{path:'author',select:'_id username fullName'}})
