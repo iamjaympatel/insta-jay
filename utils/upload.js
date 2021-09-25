@@ -40,8 +40,8 @@ const shortid=require('shortid')
 //const accessKeyId = process.env.accessKeyId;
 //const secretAccessKey = process.env.secretAccessKey;
 
-const accessKeyId ='AKIAJXHK3VRPWYQ4N6CA';
-const secretAccessKey='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';
+const accessKeyId ='';
+const secretAccessKey='';
 
 
 const s3 = new aws.S3({
